@@ -19,6 +19,11 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
+            if (!$user->is_active) {
+                Auth::logout();
+                return back()->with('error', 'Akun Anda tidak aktif. Hubungi administrator.');
+            }
+
             if ($user->role == 'admin') {
                 return redirect('/admin');
             }

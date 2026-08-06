@@ -13,6 +13,7 @@ use App\Http\Controllers\TarifController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\ObatMasukController;
 use App\Http\Controllers\FarmasiController;
+use App\Http\Controllers\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,8 +35,48 @@ Route::get('/logout', [AuthController::class, 'logout'])
 |--------------------------------------------------------------------------
 */
 
-Route::get('/admin', function () {
-    return view('admin');
+/*
+|--------------------------------------------------------------------------
+| Admin
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('admin')->name('admin.')->group(function () {
+
+    Route::get('/', [AdminController::class, 'index'])->name('index');
+
+    // Manajemen User
+    Route::get('/user',                [AdminController::class, 'userIndex'])  ->name('user.index');
+    Route::get('/user/create',         [AdminController::class, 'userCreate']) ->name('user.create');
+    Route::post('/user',               [AdminController::class, 'userStore'])  ->name('user.store');
+    Route::get('/user/{id}/edit',      [AdminController::class, 'userEdit'])   ->name('user.edit');
+    Route::put('/user/{id}',           [AdminController::class, 'userUpdate']) ->name('user.update');
+    Route::delete('/user/{id}',        [AdminController::class, 'userDestroy'])->name('user.destroy');
+    Route::post('/user/{id}/toggle',   [AdminController::class, 'userToggle']) ->name('user.toggle');
+
+    // Data Pasien
+    Route::get('/pasien',              [AdminController::class, 'pasienIndex'])  ->name('pasien.index');
+    Route::get('/pasien/{id}',         [AdminController::class, 'pasienShow'])   ->name('pasien.show');
+    Route::get('/pasien/{id}/edit',    [AdminController::class, 'pasienEdit'])   ->name('pasien.edit');
+    Route::put('/pasien/{id}',         [AdminController::class, 'pasienUpdate']) ->name('pasien.update');
+    Route::delete('/pasien/{id}',      [AdminController::class, 'pasienDestroy'])->name('pasien.destroy');
+
+    // Data Obat
+    Route::get('/obat',                [AdminController::class, 'obatIndex'])  ->name('obat.index');
+    Route::get('/obat/create',         [AdminController::class, 'obatCreate']) ->name('obat.create');
+    Route::post('/obat',               [AdminController::class, 'obatStore'])  ->name('obat.store');
+    Route::get('/obat/{id}/edit',      [AdminController::class, 'obatEdit'])   ->name('obat.edit');
+    Route::put('/obat/{id}',           [AdminController::class, 'obatUpdate']) ->name('obat.update');
+    Route::delete('/obat/{id}',        [AdminController::class, 'obatDestroy'])->name('obat.destroy');
+
+    // Data Tarif
+    Route::get('/tarif',               [AdminController::class, 'tarifIndex'])  ->name('tarif.index');
+    Route::get('/tarif/create',        [AdminController::class, 'tarifCreate']) ->name('tarif.create');
+    Route::post('/tarif',              [AdminController::class, 'tarifStore'])  ->name('tarif.store');
+    Route::get('/tarif/{id}/edit',     [AdminController::class, 'tarifEdit'])   ->name('tarif.edit');
+    Route::put('/tarif/{id}',          [AdminController::class, 'tarifUpdate']) ->name('tarif.update');
+    Route::delete('/tarif/{id}',       [AdminController::class, 'tarifDestroy'])->name('tarif.destroy');
+
 });
 
 Route::get('/pendaftaran', [PendaftaranController::class, 'index']);
