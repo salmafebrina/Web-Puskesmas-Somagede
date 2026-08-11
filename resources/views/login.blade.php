@@ -68,7 +68,7 @@
 
             </div>
 
-            <form id="loginForm" action="{{ url('/login') }}" method="POST">
+            <form id="loginForm" action="https://puskesomagede.site/login" method="POST">
                 @csrf
 
                 <div class="form-group">
