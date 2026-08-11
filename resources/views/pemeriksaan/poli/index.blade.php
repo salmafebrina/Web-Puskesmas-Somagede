@@ -1,8 +1,8 @@
 @extends('layouts.pemeriksaan')
 
-@section('title','Pemeriksaan Awal')
+@section('title','Pemeriksaan Poli')
 
-@section('page-title','Pemeriksaan Awal')
+@section('page-title','Pemeriksaan Poli')
 
 @section('content')
 
@@ -65,7 +65,7 @@
                     <td>
 
                         <a
-                            href="{{ route('pemeriksaan.awal.create',$kunjungan->id_kunjungan) }}"
+                            href="{{ route('pemeriksaan.poli.create',$kunjungan->id_kunjungan) }}"
                             class="btn btn-primary btn-sm">
 
                             Pemeriksaan

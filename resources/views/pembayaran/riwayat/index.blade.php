@@ -8,48 +8,85 @@
 
 <div class="card">
 
-    <div class="card-header d-flex justify-content-between align-items-center">
-
-        <h4 class="mb-0">
-            Riwayat Pembayaran
-        </h4>
-
-        <div>
-
-            <input
-                type="text"
-                class="form-control"
-                placeholder="Cari Nama / No RM">
-
-        </div>
-
+    <div class="card-header">
+        <strong>Filter Riwayat Pembayaran</strong>
     </div>
 
     <div class="card-body">
 
-        <table class="table table-bordered table-striped table-hover">
+        <form method="GET" action="{{ route('pembayaran.riwayat.index') }}">
 
-            <thead class="table-primary">
+            <div class="row mb-3">
+
+                <div class="col-md-3">
+                    <label>Tanggal</label>
+                    <input
+                        type="date"
+                        name="tanggal"
+                        class="form-control"
+                        value="{{ request('tanggal', date('Y-m-d')) }}">
+                </div>
+
+                <div class="col-md-5">
+                    <label>Cari Nama Pasien</label>
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Nama Pasien"
+                        value="{{ request('search') }}">
+                </div>
+
+                <div class="col-md-2 d-grid">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary">
+                        Filter
+                    </button>
+                </div>
+
+                <div class="col-md-2 d-grid">
+                    <label>&nbsp;</label>
+                    <a
+                        href="{{ route('pembayaran.riwayat.index') }}"
+                        class="btn btn-secondary">
+                        Reset
+                    </a>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<div class="card mt-3">
+
+    <div class="card-header">
+        <strong>Daftar Riwayat Pembayaran</strong>
+    </div>
+
+    <div class="card-body">
+
+        <table class="table table-bordered table-striped align-middle">
+
+            <thead class="table-light">
 
                 <tr>
 
-                    <th>No Invoice</th>
-
-                    <th>No RM</th>
-
-                    <th>Nama Pasien</th>
-
-                    <th>Poli</th>
-
-                    <th>Total</th>
-
-                    <th>Metode</th>
-
-                    <th>Status</th>
-
+                    <th>No</th>
+                    <th>No Transaksi</th>
                     <th>Tanggal</th>
-
-                    <th width="170">Aksi</th>
+                    <th>Nama Pasien</th>
+                    <th>Poli</th>
+                    <th>Jenis Pelayanan</th>
+                    <th>Jaminan</th>
+                    <th>Metode</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th width="90">Aksi</th>
 
                 </tr>
 
@@ -57,97 +94,59 @@
 
             <tbody>
 
-            @forelse($pembayarans ?? [] as $pembayaran)
+            @forelse($transaksis as $i => $transaksi)
 
                 <tr>
 
+                    <td>{{ $i+1 }}</td>
+
+                    <td>{{ $transaksi->no_transaksi }}</td>
+
                     <td>
-                        {{ $pembayaran->kode_invoice }}
+                        {{ \Carbon\Carbon::parse($transaksi->tanggal_pembayaran)->format('d-m-Y') }}
                     </td>
 
                     <td>
-                        {{ $pembayaran->id_pasien }}
+                        {{ $transaksi->kunjungan->pasien->nama_pasien }}
                     </td>
 
                     <td>
-                        {{ $pembayaran->nama_pasien }}
+                        {{ $transaksi->kunjungan->poli ?? '-' }}
                     </td>
 
                     <td>
-                        {{ $pembayaran->poli_tujuan }}
+                        {{ $transaksi->kunjungan->jenis_pelayanan ?? '-' }}
                     </td>
 
                     <td>
-
-                        Rp {{ number_format($pembayaran->total_bayar,0,',','.') }}
-
+                        {{ $transaksi->kunjungan->jenis_jaminan ?? '-' }}
                     </td>
 
                     <td>
+                        {{ $transaksi->metode_pembayaran }}
+                    </td>
 
-                        @if($pembayaran->metode_pembayaran=="QRIS")
-
-                            <span class="badge bg-info">
-
-                                QRIS
-
-                            </span>
-
-                        @else
-
-                            <span class="badge bg-secondary">
-
-                                Tunai
-
-                            </span>
-
-                        @endif
-
+                    <td>
+                        Rp {{ number_format($transaksi->total_pembayaran,0,',','.') }}
                     </td>
 
                     <td>
 
-                        @if($pembayaran->status_pembayaran=="Lunas")
+                        <span class="badge bg-success">
 
-                            <span class="badge bg-success">
+                            {{ $transaksi->status_pembayaran }}
 
-                                Lunas
-
-                            </span>
-
-                        @else
-
-                            <span class="badge bg-warning text-dark">
-
-                                Belum Lunas
-
-                            </span>
-
-                        @endif
+                        </span>
 
                     </td>
 
                     <td>
 
-                        {{ $pembayaran->created_at }}
+                        <a href="{{ route('pembayaran.riwayat.show', $transaksi->id_transaksi) }}"
+                        class="btn btn-info btn-sm">
+                        Detail
 
-                    </td>
-
-                    <td>
-
-                        <button
-                            class="btn btn-primary btn-sm">
-
-                            Detail
-
-                        </button>
-
-                        <button
-                            class="btn btn-success btn-sm">
-
-                            Cetak
-
-                        </button>
+                        </a>
 
                     </td>
 
@@ -157,9 +156,9 @@
 
                 <tr>
 
-                    <td colspan="9" class="text-center">
+                    <td colspan="11" class="text-center">
 
-                        Belum ada riwayat pembayaran.
+                        Tidak ada data pembayaran.
 
                     </td>
 

@@ -9,11 +9,16 @@ use App\Http\Controllers\AntrianController;
 use App\Http\Controllers\KunjunganController;
 use App\Http\Controllers\PemeriksaanAwalController;
 use App\Http\Controllers\PoliController;
+use App\Http\Controllers\Icd10Controller;
+use App\Http\Controllers\RujukanController;
+use App\Http\Controllers\LaboratoriumController;
+use App\Http\Controllers\RiwayatPemeriksaanController;
 use App\Http\Controllers\TarifController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\ObatMasukController;
 use App\Http\Controllers\FarmasiController;
 use App\Http\Controllers\AdminController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -201,21 +206,65 @@ Route::post(
 |--------------------------------------------------------------------------
 */
 
+Route::prefix('pemeriksaan_poli')->name('pemeriksaan.poli.')->group(function () {
+
+    Route::get('/', [PoliController::class, 'index'])
+        ->name('index');
+
+    Route::get('/{id}', [PoliController::class, 'create'])
+        ->name('create');
+
+    Route::post('/store', [PoliController::class, 'store'])
+        ->name('store');
+
+});
+
+/*|search for diagnosis|*/
 Route::get(
-    '/pemeriksaan_poli',
-    [PoliController::class, 'index']
-)->name('pemeriksaan.poli.index');
+    '/icd10/search',
+    [Icd10Controller::class,'search']
+);
 
 Route::get(
-    '/pemeriksaan_poli/{id}',
-    [PoliController::class, 'create']
-)->name('pemeriksaan.poli.create');
+    '/icd10/search',
+    [Icd10Controller::class, 'search']
+)->name('icd10.search');
 
-Route::post(
-    '/pemeriksaan_poli',
-    [PoliController::class, 'store']
-)->name('pemeriksaan.poli.store');
+/*
+|--resep--|*/
+Route::get(
+    '/resep/{id}',
+    [ResepController::class, 'show']
+)->name('resep.show');
 
+// Laboratorium
+    Route::prefix('laboratorium')
+    ->name('laboratorium.')
+    ->group(function () {
+
+        Route::get('/', [LaboratoriumController::class,'index'])
+            ->name('index');
+
+        Route::get('/{id}', [LaboratoriumController::class,'show'])
+            ->name('show');
+
+        Route::put('/{id}', [LaboratoriumController::class,'update'])
+            ->name('update');
+
+});
+
+// Rujukan
+Route::prefix('rujukan')
+    ->name('rujukan.')
+    ->group(function () {
+
+        Route::get('/', [RujukanController::class,'index'])
+            ->name('index');
+
+        Route::get('/{id}', [RujukanController::class,'show'])
+            ->name('show');
+
+});
 /*
 |--------------------------------------------------------------------------
 | Riwayat Pemeriksaan
@@ -224,8 +273,16 @@ Route::post(
 
 Route::get(
     '/riwayat-pemeriksaan',
-    [PoliController::class, 'index']
+    [RiwayatPemeriksaanController::class, 'index']
 )->name('pemeriksaan.riwayat.index');
+
+Route::prefix('pemeriksaan')->name('pemeriksaan.')->group(function () {
+    Route::get(
+        '/riwayat/{id}',
+        [RiwayatPemeriksaanController::class, 'show']
+    )->name('riwayat.show');
+
+});
 
 
 /*
@@ -233,64 +290,51 @@ Route::get(
 | Pembayaran
 |----------------------------------------------------------------------------
 */
-Route::resource('pembayaran/tarif', TarifController::class);
+Route::prefix('pembayaran')->name('pembayaran.')->group(function () {
 
-Route::get(
-    '/pembayaran/transaksi',
-    [TarifController::class, 'index']
-)->name('pembayaran.transaksi.index');
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard Pembayaran
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/', [PembayaranController::class, 'dashboard'])
+        ->name('dashboard');
 
-Route::get(
-    '/pembayaran/transaksi/{id}',
-    [TarifController::class, 'create']
-)->name('pembayaran.transaksi.create');
+    /*
+    |--------------------------------------------------------------------------
+    | Transaksi Pembayaran
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/transaksi', [PembayaranController::class, 'index'])
+        ->name('index');
 
-Route::post(
-    '/pembayaran/transaksi',
-    [TarifController::class, 'store']
-)->name('pembayaran.transaksi.store');
+    Route::get('/transaksi/{id}', [PembayaranController::class, 'show'])
+        ->name('show');
 
-/*
-|--------------------------------------------------------------------------
-| Pembayaran Tarif
-|----------------------------------------------------------------------------*/
+    Route::post('/transaksi/{id}', [PembayaranController::class, 'store'])
+        ->name('store');
 
-Route::get(
-    '/pembayaran/tarif',
-    [TarifController::class, 'index']
-)->name('pembayaran.tarif.index');
+    /*
+    |--------------------------------------------------------------------------
+    | Riwayat Pembayaran
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/riwayat', [PembayaranController::class, 'riwayat'])
+        ->name('riwayat.index');
 
-Route::get(
-    '/pembayaran/tarif/{id}',
-    [TarifController::class, 'create']
-)->name('pembayaran.tarif.create');
+    Route::get('/riwayat/{id}', [PembayaranController::class, 'showRiwayat'])
+        ->name('riwayat.show');
 
-Route::post(
-    '/pembayaran/tarif',
-    [TarifController::class, 'store']
-)->name('pembayaran.tarif.store');
-
-/*
-|--------------------------------------------------------------------------
-| Riwayat Pembayaran
-|----------------------------------------------------------------------------*/ 
-
-Route::get(
-    '/pembayaran/riwayat',
-    [PembayaranController::class, 'index']
-)->name('pembayaran.riwayat.index');
-
-Route::get(
-    '/pembayaran/riwayat/{id}',
-    [PembayaranController::class, 'create']
-)->name('pembayaran.riwayat.create');
-
-Route::post(
-    '/pembayaran/riwayat',
-    [PembayaranController::class, 'store']
-)->name('pembayaran.riwayat.store');
-
-
+    Route::get('/{id}/selesai',[ PembayaranController::class,'selesai'])
+        ->name('selesai'); 
+    /*
+    |--------------------------------------------------------------------------
+    | Cetak Bukti Pembayaran
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/{id}/cetak',[ PembayaranController::class,'cetak'])
+        ->name('transaksi.cetak');
+    });
 /*
 |--------------------------------------------------------------------------
 | Obat Masuk
@@ -320,6 +364,15 @@ Route::post('/farmasi/Antrian-Resep', [FarmasiController::class, 'store'])
 Route::get('/farmasi/Riwayat-Penyerahan', [FarmasiController::class, 'riwayat'])
     ->name('farmasi.riwayat.index');
 
+    Route::get(
+'/farmasi/Riwayat-Penyerahan/{id}',
+[FarmasiController::class,'showRiwayat']
+)->name('farmasi.riwayat.show');
+
+    Route::post(
+    '/farmasi/obat-keluar',
+    [FarmasiController::class,'store']
+    )->name('farmasi.store');
 
 /*
 |--------------------------------------------------------------------------

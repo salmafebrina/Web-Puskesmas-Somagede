@@ -54,7 +54,7 @@
 
                         <a href="{{ route('pemeriksaan.awal.poli', $poli->poli_tujuan) }}" class="btn btn-primary">
                             Masuk <i class="fas fa-arrow-right ms-2"></i>
-                        </span>
+                        </a>
 
                     </div>
                 </div>

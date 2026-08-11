@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Kunjungan;
 use App\Models\Antrian;
 use App\Models\Pasien;
+use App\Models\Pembayaran;
 use Illuminate\Http\Request;
 
 class KunjunganController extends Controller
@@ -71,6 +72,7 @@ class KunjunganController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'jenis_antrian'       => 'required',
     'nik_pasien'          => 'required',
     'tanggal_kunjungan'   => 'required',
     'status_pasien'       => 'required',
@@ -93,6 +95,7 @@ class KunjunganController extends Controller
         Kunjungan::create([
 
             'kode_kunjungan'   => $kodeKunjungan,
+            'jenis_antrian' => $request->jenis_antrian,
             'tanggal_kunjungan' => $request->tanggal_kunjungan,
 
             'nik_pasien'       => $request->nik_pasien,
@@ -190,8 +193,7 @@ class KunjunganController extends Controller
             'poli_tujuan'        => 'required',
             'surat_keterangan'   => 'required',
         ]);
-
-        $kunjungan = Kunjungan::findOrFail($id);
+        $kunjungan = Kunjungan::with(['pemeriksaan'])->findOrFail($id);
 
         $kunjungan->update([
 
@@ -217,3 +219,5 @@ class KunjunganController extends Controller
             );
     }
 }
+
+

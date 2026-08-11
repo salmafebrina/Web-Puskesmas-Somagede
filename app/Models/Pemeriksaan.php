@@ -19,10 +19,15 @@ class Pemeriksaan extends Model
     protected $fillable = [
 
         'id_kunjungan',
+        'jenis_antrian',
 
         'berat_badan',
 
         'tinggi_badan',
+        'triase',
+        'risiko_jatuh',
+        'kondisi_khusus',
+        'alergi',
 
         'lingkar_perut',
 
@@ -50,3 +55,4 @@ class Pemeriksaan extends Model
 
     ];
 }
+

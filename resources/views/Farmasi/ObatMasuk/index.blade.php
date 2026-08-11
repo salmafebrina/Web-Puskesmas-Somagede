@@ -91,7 +91,7 @@
                     <td>
 
                         <a
-                            href="{{ route('obat-masuk.edit',$obatMasuk->id_obat_masuk) }}"
+                            href="{{ route('obat-masuk.edit',$obatMasuk->id_obat) }}"
                             class="btn btn-warning btn-sm">
 
                             Edit

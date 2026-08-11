@@ -9,10 +9,22 @@ use Illuminate\Http\Request;
 
 class PendaftaranController extends Controller
 {
-    public function index()
-    {
-        return view('pendaftaran');
+    public function index(Request $request)
+{
+    $query = Kunjungan::query();
+
+    // Jika user memilih tanggal
+    if ($request->filled('tanggal')) {
+        $query->whereDate('tanggal_kunjungan', $request->tanggal);
+    } else {
+        // Default tampilkan kunjungan hari ini
+        $query->whereDate('tanggal_kunjungan', now()->toDateString());
     }
+
+    $kunjungans = $query->get();
+
+    return view('pendaftaran', compact('kunjungans'));
+}
 
 
 public function daftar()

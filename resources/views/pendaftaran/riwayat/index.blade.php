@@ -34,6 +34,7 @@
                     name="tanggal"
                     class="form-control"
                     value="{{ $tanggal }}">
+                </div>
 
                 <div class="col-md-4 d-flex align-items-end">
 

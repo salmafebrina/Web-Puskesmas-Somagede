@@ -1,193 +1,100 @@
 @extends('layouts.pembayaran')
 
-@section('title', 'Daftar Kunjungan')
-
-@section('page-title', 'Daftar Kunjungan')
+@section('title', 'Pembayaran')
 
 @section('content')
 
-@if(session('success'))
+<div class="container">
 
-<div
-    class="modal fade show"
-    id="pasienModal"
-    style="display:block; background:rgba(0,0,0,.5);"
-    tabindex="-1">
+    <h4 class="mb-4">Data Pembayaran</h4>
 
-    <div class="modal-dialog">
+    <div class="card">
 
-        <div class="modal-content">
+        <div class="card-body">
 
-            <div class="modal-header bg-success text-white">
+            <table class="table table-bordered table-striped">
 
-                <h5 class="modal-title">
-                    Data Pasien Berhasil Ditambahkan
-                </h5>
-
-            </div>
-
-            <div class="modal-body">
-
-                <table class="table">
+                <thead>
 
                     <tr>
 
-                        <th>Nama Pasien</th>
+                        <th>No</th>
 
-                        <td>{{ session('nama_pasien') }}</td>
-
-                    </tr>
-
-                    <tr>
-
-                        <th>NIK</th>
-
-                        <td>{{ session('nik_pasien') }}</td>
-
-                    </tr>
-
-                    <tr>
+                        <th>Tanggal</th>
 
                         <th>No RM</th>
 
-                        <td>{{ session('no_rm') }}</td>
+                        <th>Nama Pasien</th>
+
+                        <th>Jenis Pembiayaan</th>
+
+                        <th>Status</th>
+
+                        <th>Aksi</th>
 
                     </tr>
 
-                </table>
+                </thead>
 
-            </div>
+                <tbody>
 
-            <div class="modal-footer">
+                @forelse($kunjungans as $item)
 
-                <a
-                    href="{{ route('kunjungan.create', session('id_antrian')) }}"
-                    class="btn btn-success">
+                    <tr>
 
-                    Daftarkan Kunjungan
+                        <td>{{ $loop->iteration }}</td>
 
-                </a>
+                        <td>{{ $item->tanggal_kunjungan }}</td>
 
-                <button
-                    class="btn btn-secondary"
-                    onclick="document.getElementById('pasienModal').style.display='none'">
+                        <td>{{ $item->pasien->id_rekam_medis ?? '-' }}</td>
 
-                    Tutup
+                        <td>{{ $item->pasien->nama_pasien }}</td>
 
-                </button>
+                        <td>{{ $item->jenis_pembiayaan }}</td>
 
-            </div>
+                        <td>
 
-        </div>
+                            <span class="badge bg-warning">
 
-    </div>
+                                {{ $item->status_kunjungan }}
 
-</div>
-
-@endif
-
-<div class="card">
-
-    <div class="card-header">
-        <h4>Daftar Antrian Kunjungan</h4>
-    </div>
-
-    <div class="card-body">
-
-        <table class="table table-bordered table-striped">
-
-            <thead>
-                <tr>
-                    <th>No Antrian</th>
-                    <th>NIK</th>
-                    <th>Poli Tujuan</th>
-                    <th>Jaminan</th>
-                    <th>Jenis Antrian</th>
-                    <th>Status Pasien</th>
-                    <th width="220">Aksi</th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-            @forelse($antrians as $antrian)
-
-                <tr>
-
-                    <td>{{ $antrian->kode_antrian }}</td>
-
-                    <td>{{ $antrian->nik_pasien }}</td>
-
-                    <td>{{ $antrian->poli_tujuan }}</td>
-
-                    <td>{{ $antrian->jenis_jaminan }}</td>
-
-                    <td>{{ $antrian->jenis_antrian }}</td>
-
-                    <td>
-
-                        @if($antrian->status_pasien == 'Pasien Lama')
-
-                            <span class="badge bg-success">
-                                Pasien Lama
                             </span>
 
-                        @else
+                        </td>
 
-                            <span class="badge bg-danger">
-                                Pasien Baru
-                            </span>
+                        <td>
 
-                        @endif
+                            <a href="{{ route('pembayaran.show', $item->id_kunjungan) }}"
 
-                    </td>
-
-                    <td>
-
-                        @if($antrian->status_pasien == 'Pasien Lama')
-
-                            <a href="{{ route('kunjungan.create', $antrian->id_antrian) }}"
                                class="btn btn-success btn-sm">
 
-                                Daftarkan Kunjungan
+                                Bayar
 
                             </a>
 
-                        @else
+                        </td>
 
-                            <a href="{{ route('pasien.create',[
-                                    'nik'=>$antrian->nik_pasien,
-                                    'id_antrian'=>$antrian->id_antrian
-                                ]) }}"
-                               class="btn btn-warning btn-sm">
+                    </tr>
 
-                                Simpan Data Pasien
+                @empty
 
-                            </a>
+                    <tr>
 
-                        @endif
+                        <td colspan="7" class="text-center">
 
-                    </td>
+                            Tidak ada pasien menunggu pembayaran.
 
-                </tr>
+                        </td>
 
-            @empty
+                    </tr>
 
-                <tr>
+                @endforelse
 
-                    <td colspan="7" class="text-center">
+                </tbody>
 
-                        Belum ada data antrian.
+            </table>
 
-                    </td>
-
-                </tr>
-
-            @endforelse
-
-            </tbody>
-
-        </table>
+        </div>
 
     </div>
 

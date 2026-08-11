@@ -62,13 +62,13 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ route('pembayaran.transaksi.index') }}" class="nav-link">
+                    <a href="{{ route('pembayaran.index') }}" class="nav-link">
                         Transaksi Pembayaran
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ route('pembayaran.tarif.index') }}" class="nav-link">
+                    <a href="">
                         Daftar Tarif
                     </a>
                 </li>

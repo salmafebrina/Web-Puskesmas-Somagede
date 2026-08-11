@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pemeriksaan;
 use App\Models\Kunjungan;
+use App\Models\Antrian;
 use Illuminate\Http\Request;
 
 class PemeriksaanAwalController extends Controller
@@ -41,16 +42,18 @@ class PemeriksaanAwalController extends Controller
     {
         $kunjungan = Kunjungan::findOrFail($id);
 
-        return view(
-            'pemeriksaan.awal.create',
-            compact('kunjungan')
-        );
+    return view(
+        'pemeriksaan.awal.create',
+        compact('kunjungan')
+    );
     }
+
 
     public function store(Request $request)
     {
         $request->validate([
             'id_kunjungan'   => 'required',
+            'jenis_antrian'    => 'required',
             'berat_badan'    => 'required',
             'tinggi_badan'   => 'required',
             'lingkar_perut'  => 'required',
@@ -64,6 +67,7 @@ class PemeriksaanAwalController extends Controller
         Pemeriksaan::create([
 
             'id_kunjungan'      => $request->id_kunjungan,
+            'jenis_antrian'      => $request->jenis_antrian,
 
             'berat_badan'       => $request->berat_badan,
 
@@ -81,16 +85,20 @@ class PemeriksaanAwalController extends Controller
 
             'keluhan'           => $request->keluhan,
 
+            'triase'            => $request->triase,
+            'risiko_jatuh'      => $request->risiko_jatuh,
+            'kondisi_khusus'    => $request->kondisi_khusus,
+            'alergi'            => $request->alergi,
+            'objektif'          => $request->objektif,
+            'assessment'        => $request->assessment,
+
             // nanti diisi dokter
-            'objektif'          => null,
-            'assessment'        => null,
-            'diagnosa'          => null,
-            'kode_icd10'        => null,
-            'tindakan'          => null,
+            
 
             'status_pemeriksaan' => 'Menunggu Pemeriksaan Poli'
 
         ]);
+        
 
         Kunjungan::where(
             'id_kunjungan',

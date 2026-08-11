@@ -7,6 +7,8 @@
     <title>@yield('title')</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
 
 .sidebar{
@@ -65,8 +67,6 @@
 
         <hr>
 
-        <ul class="nav flex-column">
-
             <ul class="nav flex-column mt-3">
 
     <li class="nav-item mb-2">
@@ -102,20 +102,7 @@
 
             <i class="fas fa-print me-2"></i>
 
-            Pemeriksaaan Poli
-
-        </a>
-
-    </li>
-
-    <li class="nav-item mb-2">
-
-        <a href="{{ route('pendaftaran.daftar.index') }}"
-        class="nav-link text-white">
-
-            <i class="fas fa-notes-medical me-2"></i>
-
-            Daftar Kunjungan
+            Pemeriksaan Poli
 
         </a>
 
@@ -134,7 +121,31 @@
 
     </li>
 
-</ul>
+    <li class="nav-item">
+
+        <a href="{{ route('rujukan.index') }}"
+        class="nav-link text-white">
+
+            <i class="fas fa-history me-2"></i>
+
+            Pasien Rujukan
+
+        </a>
+
+    </li>
+
+    <li class="nav-item">
+
+        <a href="{{ route('laboratorium.index') }}"
+        class="nav-link text-white">
+
+            <i class="fas fa-history me-2"></i>
+
+            Hasil Laboratorium
+
+        </a>
+
+    </li>
 
         </ul>
 
@@ -165,6 +176,78 @@
     </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+$(document).ready(function(){
+
+    $('#kode_icd10').select2({
+
+        width: '100%',
+
+        placeholder: 'Cari kode atau nama penyakit',
+
+        allowClear: true,
+
+        minimumInputLength: 1,
+
+        ajax:{
+
+            url:'{{ route("icd10.search") }}',
+
+            dataType:'json',
+
+            delay:250,
+
+            data:function(params){
+
+                return{
+
+                    q:params.term
+
+                };
+
+            },
+
+            processResults:function(data){
+
+                return{
+
+                    results:data.map(function(item){
+
+                        return{
+
+                            id:item.id,
+
+                            text:item.text,
+
+                            display:item.display
+
+                        };
+
+                    })
+
+                };
+
+            }
+
+        }
+
+    });
+
+    $('#kode_icd10').on('select2:select', function(e){
+
+        let data = e.params.data;
+
+        $('#nama_penyakit').val(data.display);
+
+    });
+
+});
+</script>
 
 </body>
 </html>

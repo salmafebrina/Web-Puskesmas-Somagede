@@ -7,6 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Kunjungan extends Model
 {
+    public function pemeriksaan()
+{
+    return $this->hasOne(
+        Pemeriksaan::class,
+        'id_kunjungan',
+        'id_kunjungan'
+    );
+}
+
     public function pasien()
     {
     return $this->belongsTo(
@@ -24,6 +33,7 @@ class Kunjungan extends Model
     protected $fillable = [
 
         'kode_kunjungan',
+        'jenis_antrian',
 
         'nik_pasien',
 

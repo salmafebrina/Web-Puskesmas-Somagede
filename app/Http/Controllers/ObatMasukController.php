@@ -33,7 +33,7 @@ class ObatMasukController extends Controller
     public function store(Request $request)
     {
     $request->validate([
-        'id_obat' => 'required',
+        'nama_obat' => 'required',
         'tanggal_masuk' => 'required|date',
         'jumlah_masuk' => 'required|integer|min:1',
         'keterangan' => 'nullable'
@@ -41,7 +41,7 @@ class ObatMasukController extends Controller
 
     // Simpan riwayat obat masuk
     ObatMasuk::create([
-        'id_obat' => $request->id_obat,
+        'nama_obat' => $request->nama_obat,
         'tanggal_masuk' => $request->tanggal_masuk,
         'jumlah_masuk' => $request->jumlah_masuk,
         'keterangan' => $request->keterangan,

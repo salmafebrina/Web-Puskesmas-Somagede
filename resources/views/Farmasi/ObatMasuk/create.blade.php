@@ -18,24 +18,11 @@
 
                 <label>Nama Obat</label>
 
-                <select
-                    name="id_obat"
+                <input
+                    name="nama_obat"
+                    type="text"
                     class="form-control"
                     required>
-
-                    <option value="">-- Pilih Obat --</option>
-
-                    @foreach($obats as $obat)
-
-                        <option value="{{ $obat->id_obat }}">
-
-                            {{ $obat->nama_obat }}
-
-                        </option>
-
-                    @endforeach
-
-                </select>
 
             </div>
 

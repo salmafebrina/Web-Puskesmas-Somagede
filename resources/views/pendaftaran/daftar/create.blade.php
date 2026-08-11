@@ -22,6 +22,11 @@
                    name="id_antrian"
                    value="{{ $antrian->id_antrian }}">
 
+            <input type="hidden"
+                   name="jenis_antrian"
+                   value="{{ $antrian->jenis_antrian }}">
+       
+
             {{-- ========================= --}}
             {{-- DATA PASIEN --}}
             {{-- ========================= --}}

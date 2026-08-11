@@ -22,4 +22,12 @@ class Obat extends Model
         'stok_minimum',
         'tanggal_expired',
     ];
+
+    public function detailPenggunaan()
+{
+    return $this->hasMany(
+        DetailPenggunaanObat::class,
+        'id_obat'
+    );
+}
 }

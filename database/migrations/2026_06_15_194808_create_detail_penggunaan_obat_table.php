@@ -11,30 +11,30 @@ return new class extends Migration
      */
     public function up(): void
 {
-    Schema::create('detail_penggunaan_obat', function (Blueprint $table) {
+    Schema::create('detail_penggunaan_obats', function (Blueprint $table) {
 
-        $table->id('id_detail_obat');
+    $table->id('id_detail');
 
-        $table->unsignedBigInteger('id_rekam_medis');
+    $table->unsignedBigInteger('id_resep');
 
-        $table->unsignedBigInteger('id_obat');
+    $table->unsignedBigInteger('id_obat');
 
-        $table->integer('jumlah_obat');
+    $table->integer('jumlah');
 
-        $table->string('aturan_pakai')->nullable();
+    $table->string('aturan_pakai');
 
-        $table->timestamps();
+    $table->timestamps();
 
-        $table->foreign('id_rekam_medis')
-              ->references('id_rekam_medis')
-              ->on('riwayat_medis')
-              ->onDelete('cascade');
+    $table->foreign('id_resep')
+        ->references('id_resep')
+        ->on('reseps')
+        ->cascadeOnDelete();
 
-        $table->foreign('id_obat')
-              ->references('id_obat')
-              ->on('obats')
-              ->onDelete('cascade');
-    });
+    $table->foreign('id_obat')
+        ->references('id_obat')
+        ->on('obats')
+        ->cascadeOnDelete();
+});
 }
 
     /**
