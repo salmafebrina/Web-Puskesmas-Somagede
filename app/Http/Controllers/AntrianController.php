@@ -11,7 +11,13 @@ class AntrianController extends Controller
 {
     public function index()
     {
-        $antrians = Antrian::latest()->get();
+
+    $antrians = Antrian::whereDate(
+    'created_at',
+    Carbon::today()
+    )
+    ->orderBy('created_at')
+    ->get();
 
         $jumlahReguler = Antrian::where('jenis_antrian', 'Reguler')
             ->whereDate('tanggal_kunjungan', today())

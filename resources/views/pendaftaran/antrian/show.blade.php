@@ -88,11 +88,9 @@
 
                 </button>
 
-                <a href="{{ route('antrian.create') }}"
-                   class="btn btn-secondary">
-
-                    Antrian Baru
-
+                <a href="{{ route('antrian.index') }}"
+                class="btn btn-success">
+                <i class="bi bi-check-circle"></i> Selesai
                 </a>
 
             </div>

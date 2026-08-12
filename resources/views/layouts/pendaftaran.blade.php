@@ -47,6 +47,17 @@
 
 }
 
+.table-fit {
+    width: auto !important;
+    table-layout: auto;
+}
+
+.table-fit th,
+.table-fit td {
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
 </style>
 
 </head>

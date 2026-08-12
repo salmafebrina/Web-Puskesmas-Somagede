@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pasien;
 use App\Models\Antrian;
 use App\Models\Kunjungan;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PendaftaranController extends Controller
@@ -29,21 +30,24 @@ class PendaftaranController extends Controller
 
 public function daftar()
 {
-    $antrianPrioritas = Antrian::where('status_antrian', 'Menunggu')
-        ->where('jenis_antrian', 'Prioritas')
-        ->orderBy('created_at')
-        ->get();
+    $prioritas = Antrian::whereDate('created_at', today())
+    ->where('jenis_antrian','Prioritas')
+    ->where('status_antrian','Menunggu')
+    ->orderBy('created_at')
+    ->get();
 
-    $antrianReguler = Antrian::where('status_antrian', 'Menunggu')
-        ->where('jenis_antrian', 'Reguler')
-        ->orderBy('created_at')
-        ->get();
+    $reguler = Antrian::whereDate('created_at', today())
+    ->where('jenis_antrian','Reguler')
+    ->where('status_antrian','Menunggu')
+    ->orderBy('created_at')
+    ->get();
+    
 
     return view('pendaftaran.daftar.index', [
-        'antrianPrioritas' => $antrianPrioritas,
-        'antrianReguler'   => $antrianReguler,
-        'jumlahPrioritas'  => $antrianPrioritas->count(),
-        'jumlahReguler'    => $antrianReguler->count(),
+        'antrianPrioritas' => $prioritas,
+        'antrianReguler'   => $reguler,
+        'jumlahPrioritas'  => $prioritas->count(),
+        'jumlahReguler'    => $reguler->count(),
     ]);
 }
 

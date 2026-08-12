@@ -20,14 +20,16 @@
             <div class="modal-header bg-success text-white">
 
                 <h5 class="modal-title">
-                    Data Pasien Berhasil Ditambahkan
+
+                    ✔ Data Berhasil Disimpan
+
                 </h5>
+                </div>
+            <div class="card shadow-sm mb-4 d-inline-block">
 
-            </div>
+                <div class="card-body">
 
-            <div class="modal-body">
-
-                <table class="table">
+                    <table class="table table-bordered">
 
                     <tr>
                         <th>Nama Pasien</th>
@@ -45,6 +47,7 @@
                     </tr>
 
                 </table>
+                </div>
 
             </div>
 
@@ -97,7 +100,7 @@
 
     <div class="card-body">
 
-        <div class="table-responsive">
+           <div class="table-responsive">
 
             <table class="table table-bordered table-hover align-middle">
 
@@ -111,7 +114,7 @@
                         <th>Jaminan</th>
                         <th>Jenis Antrian</th>
                         <th>Status Pasien</th>
-                        <th width="220">Aksi</th>
+                        <th>Aksi</th>
 
                     </tr>
 
@@ -156,37 +159,35 @@
                         </td>
 
                         <td>
-                            <button
-                                type="button"
-                                class="btn btn-primary btn-sm"
-                                onclick="panggilAntrian('{{ $antrian->kode_antrian }}')">
+                            <div class="d-flex flex-column gap-1">
 
-                                <i class="bi bi-volume-up-fill"></i> Panggil
+    <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        onclick="panggilAntrian('{{ $antrian->kode_antrian }}')">
+        <i class="bi bi-volume-up-fill"></i> Panggil
+    </button>
 
-                            </button>
+    @if($antrian->status_pasien == 'Pasien Lama')
 
-                            @if($antrian->status_pasien == 'Pasien Lama')
+        <a href="{{ route('kunjungan.create',$antrian->id_antrian) }}"
+           class="btn btn-success btn-sm">
+            Daftarkan Kunjungan
+        </a>
 
-                                <a href="{{ route('kunjungan.create',$antrian->id_antrian) }}"
-                                   class="btn btn-success btn-sm">
+    @else
 
-                                    Daftarkan Kunjungan
+        <a href="{{ route('pasien.create',[
+            'nik'=>$antrian->nik_pasien,
+            'id_antrian'=>$antrian->id_antrian
+        ]) }}"
+           class="btn btn-warning btn-sm">
+            Simpan Data Pasien
+        </a>
 
-                                </a>
+    @endif
 
-                            @else
-
-                                <a href="{{ route('pasien.create',[
-                                        'nik'=>$antrian->nik_pasien,
-                                        'id_antrian'=>$antrian->id_antrian
-                                    ]) }}"
-                                   class="btn btn-warning btn-sm">
-
-                                    Simpan Data Pasien
-
-                                </a>
-
-                            @endif
+</div>
 
                         </td>
 
@@ -298,37 +299,34 @@
                         </td>
 
                         <td>
+                            <div class="d-flex flex-column gap-1">
+
                             <button
-                                type="button"
-                                class="btn btn-primary btn-sm"
-                                onclick="panggilAntrian('{{ $antrian->kode_antrian }}')">
+        type="button"
+        class="btn btn-primary btn-sm"
+        onclick="panggilAntrian('{{ $antrian->kode_antrian }}')">
+        <i class="bi bi-volume-up-fill"></i> Panggil
+    </button>
 
-                                <i class="bi bi-volume-up-fill"></i> Panggil
+    @if($antrian->status_pasien == 'Pasien Lama')
 
-                            </button>
+        <a href="{{ route('kunjungan.create',$antrian->id_antrian) }}"
+           class="btn btn-success btn-sm">
+            Daftarkan Kunjungan
+        </a>
 
-                            @if($antrian->status_pasien == 'Pasien Lama')
+    @else
 
-                                <a href="{{ route('kunjungan.create',$antrian->id_antrian) }}"
-                                   class="btn btn-success btn-sm">
+        <a href="{{ route('pasien.create',[
+            'nik'=>$antrian->nik_pasien,
+            'id_antrian'=>$antrian->id_antrian
+        ]) }}"
+           class="btn btn-warning btn-sm">
+            Simpan Data Pasien
+        </a>
 
-                                    Daftarkan Kunjungan
-
-                                </a>
-
-                            @else
-
-                                <a href="{{ route('pasien.create',[
-                                        'nik'=>$antrian->nik_pasien,
-                                        'id_antrian'=>$antrian->id_antrian
-                                    ]) }}"
-                                   class="btn btn-warning btn-sm">
-
-                                    Simpan Data Pasien
-
-                                </a>
-
-                            @endif
+    @endif
+    </div>
 
                         </td>
 
@@ -380,5 +378,6 @@ function panggilAntrian(kodeAntrian){
 }
 
 </script>
+
 
 @endsection
