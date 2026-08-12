@@ -6,7 +6,6 @@
     <title>Login - Puskesmas Somagede</title>
 
     <link rel="stylesheet" href="{{ asset('public/css/login.css') }}">
-<script src="{{ asset('public/js/login.js') }}"></script>
 </head>
 <body>
 
