@@ -16,6 +16,7 @@ use App\Http\Controllers\RiwayatPemeriksaanController;
 use App\Http\Controllers\TarifController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\ObatMasukController;
+use App\Http\Controllers\ResepController;
 use App\Http\Controllers\FarmasiController;
 use App\Http\Controllers\AdminController;
 
@@ -86,9 +87,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 Route::get('/pendaftaran', [PendaftaranController::class, 'index']);
 
-Route::get('/pemeriksaan', function () {
-    return view('pemeriksaan.dashboard');
-});
+Route::get( '/pemeriksaan', [PoliController::class, 'dashboard']
+)->name('pemeriksaan.dashboard');
 
 Route::get('/pembayaran', [PembayaranController::class, 'index']);
 
@@ -208,12 +208,19 @@ Route::post(
 
 Route::prefix('pemeriksaan_poli')->name('pemeriksaan.poli.')->group(function () {
 
+    // Dashboard pemeriksaan poli
     Route::get('/', [PoliController::class, 'index'])
         ->name('index');
 
+    // Daftar pasien berdasarkan poli
+    Route::get('/poli/{namaPoli}', [PoliController::class, 'poli'])
+        ->name('daftar');
+
+    // Form pemeriksaan pasien
     Route::get('/{id}', [PoliController::class, 'create'])
         ->name('create');
 
+    // Simpan pemeriksaan poli
     Route::post('/store', [PoliController::class, 'store'])
         ->name('store');
 
@@ -231,11 +238,11 @@ Route::get(
 )->name('icd10.search');
 
 /*
-|--resep--|*/
 Route::get(
     '/resep/{id}',
     [ResepController::class, 'show']
 )->name('resep.show');
+*/
 
 // Laboratorium
     Route::prefix('laboratorium')

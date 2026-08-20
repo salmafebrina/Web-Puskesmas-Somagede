@@ -1,20 +1,51 @@
 @extends('layouts.pemeriksaan')
 
-@section('title','Riwayat Pemeriksaan')
+@section('title', 'Riwayat Pemeriksaan')
 
-@section('page-title','Riwayat Pemeriksaan')
+@section('page-title', 'Riwayat Pemeriksaan')
 
 @section('content')
 
 <div class="card shadow-sm border-0">
 
-    <div class="card-header bg-white">
+    <div class="card-header bg-white py-3">
 
-        <h4 class="mb-0">
-            Riwayat Pemeriksaan Pasien
-        </h4>
+        <div class="d-flex justify-content-between align-items-center">
+
+            <h4 class="mb-0">
+                Riwayat Pemeriksaan Pasien
+            </h4>
+
+            <form
+                method="GET"
+                action="{{ route('pemeriksaan.riwayat.index') }}"
+                class="d-flex align-items-center gap-2"
+            >
+
+                <label class="mb-0">
+                    Tanggal:
+                </label>
+
+                <input
+                    type="date"
+                    name="tanggal"
+                    value="{{ $tanggal }}"
+                    class="form-control"
+                >
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Tampilkan
+                </button>
+
+            </form>
+
+        </div>
 
     </div>
+
 
     <div class="card-body">
 
@@ -26,6 +57,8 @@
 
                     <tr>
 
+                        <th>No</th>
+
                         <th>No RM</th>
 
                         <th>Nama Pasien</th>
@@ -36,73 +69,88 @@
 
                         <th>Status</th>
 
-                        <th width="120">Aksi</th>
+                        <th>Aksi</th>
 
                     </tr>
 
                 </thead>
 
+
                 <tbody>
 
-                @forelse($kunjungans as $kunjungan)
+                    @forelse($pemeriksaans as $pemeriksaan)
 
-                    <tr>
+                        <tr>
 
-                        <td>
-                            {{ $kunjungan->pasien->id_rekam_medis ?? '-' }}
-                        </td>
+                            <td>
+                                {{ $loop->iteration }}
+                            </td>
 
-                        <td>
-                            {{ $kunjungan->pasien->nama_pasien }}
-                        </td>
+                            <td>
+                                {{ $pemeriksaan->kunjungan->pasien->no_rm ?? '-' }}
+                            </td>
 
-                        <td>
-                            {{ $kunjungan->poli }}
-                        </td>
+                            <td>
+                                {{ $pemeriksaan->kunjungan->pasien->nama_pasien ?? '-' }}
+                            </td>
 
-                        <td>
-                            {{ \Carbon\Carbon::parse($kunjungan->created_at)->format('d-m-Y') }}
-                        </td>
+                            <td>
+                                {{ $pemeriksaan->kunjungan->poli_tujuan ?? '-' }}
+                            </td>
 
-                        <td>
+                            <td>
+                                {{ $pemeriksaan->created_at
+                                    ? $pemeriksaan->created_at->format('d-m-Y')
+                                    : '-' }}
+                            </td>
 
-                            <span class="badge bg-success">
+                            <td>
 
-                                Selesai
+                                <span class="badge bg-success">
+                                    Selesai
+                                </span>
 
-                            </span>
+                            </td>
 
-                        </td>
+                            <td>
 
-                        <td>
+                                <a
+                                    href="{{ route(
+                                        'pemeriksaan.riwayat.show',
+                                        $pemeriksaan->id_pemeriksaan
+                                    ) }}"
+                                    class="btn btn-primary btn-sm"
+                                >
+                                    <i class="fas fa-eye"></i>
+                                    Detail
+                                </a>
 
-                            <a
-                                href="{{ route('pemeriksaan.riwayat.show',$kunjungan->id_kunjungan) }}"
-                                class="btn btn-primary btn-sm">
+                            </td>
 
-                                <i class="fas fa-eye"></i>
+                        </tr>
 
-                                Detail
+                    @empty
 
-                            </a>
+                        <tr>
 
-                        </td>
+                            <td
+                                colspan="7"
+                                class="text-center py-4"
+                            >
 
-                    </tr>
+                                <div class="text-muted">
 
-                @empty
+                                    Tidak ada riwayat pemeriksaan
+                                    pada tanggal
+                                    {{ \Carbon\Carbon::parse($tanggal)->format('d-m-Y') }}.
 
-                    <tr>
+                                </div>
 
-                        <td colspan="6" class="text-center">
+                            </td>
 
-                            Belum ada riwayat pemeriksaan.
+                        </tr>
 
-                        </td>
-
-                    </tr>
-
-                @endforelse
+                    @endforelse
 
                 </tbody>
 

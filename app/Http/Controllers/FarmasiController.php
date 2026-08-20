@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Resep;
 use App\Models\Pemeriksaan;
 use App\Models\RiwayatPenyerahan;
+use App\Models\Kunjungan;
+use App\Models\Obat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -13,9 +15,54 @@ use Illuminate\Support\Facades\Auth;
 class FarmasiController extends Controller
 {
     public function farmasi()
-    {
-        return view('farmasi');
-    }
+{
+    // =============================
+    // RESEP MENUNGGU
+    // =============================
+
+    $resepMenunggu = Kunjungan::where(
+        'status_kunjungan',
+        'Menunggu Pembayaran'
+    )->count();
+
+
+    // =============================
+    // PASIEN SELESAI HARI INI
+    // =============================
+
+    $pasienSelesai = Kunjungan::whereDate(
+        'updated_at',
+        today()
+    )
+    ->where(
+        'status_kunjungan',
+        'Selesai'
+    )
+    ->count();
+
+
+    // =============================
+    // STOK OBAT MENIPIS
+    // =============================
+
+    $stokMenipis = Obat::whereColumn(
+        'stok_obat',
+        '<=',
+        'stok_minimum'
+    )
+    ->orderBy('stok_obat')
+    ->get();
+
+
+    return view(
+        'farmasi',
+        compact(
+            'resepMenunggu',
+            'pasienSelesai',
+            'stokMenipis'
+        )
+    );
+}
 
     public function penyerahan()
     {
@@ -83,18 +130,25 @@ class FarmasiController extends Controller
         return view('farmasi.ObatKeluar.index');
     }
 
-   public function riwayat()
+   public function riwayat(Request $request)
 {
+    // Default tampilkan riwayat hari ini
+    $tanggal = $request->tanggal ?? now()->toDateString();
+
     $riwayats = RiwayatPenyerahan::with([
         'resep.pemeriksaan.kunjungan.pasien',
         'resep.detailObat.obat'
     ])
+    ->whereDate('tanggal_penyerahan', $tanggal)
     ->latest('tanggal_penyerahan')
     ->get();
 
     return view(
         'farmasi.riwayat.index',
-        compact('riwayats')
+        compact(
+            'riwayats',
+            'tanggal'
+        )
     );
 }
 

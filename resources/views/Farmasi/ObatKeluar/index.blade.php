@@ -32,6 +32,7 @@
                         <th>Tanggal</th>
                         <th>No Rekam Medis</th>
                         <th>Nama Pasien</th>
+                        <th>Poli</th>
                         <th>Dokter</th>
                         <th>Status</th>
                         <th width="15%">Aksi</th>
@@ -59,6 +60,10 @@
 
                         <td>
                             {{ $resep->pemeriksaan->kunjungan->pasien->nama_pasien ?? '-' }}
+                        </td>
+
+                        <td>
+                        {{ $resep->pemeriksaan->kunjungan->poli_tujuan ?? '-' }}
                         </td>
 
                         <td>

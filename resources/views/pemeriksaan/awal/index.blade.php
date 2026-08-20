@@ -1,89 +1,328 @@
 @extends('layouts.pemeriksaan')
 
-@section('title','Pemeriksaan Awal')
+@section('title', 'Pemeriksaan Awal')
 
-@section('page-title','Pemeriksaan Awal')
+@section('page-title', 'Pemeriksaan Awal')
 
 @section('content')
 
-<div class="container-fluid">
+<style>
 
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <p class="text-muted mb-0">
-                        Silakan pilih poli untuk melihat daftar pasien yang akan dilakukan pemeriksaan awal.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
+    /* ==============================
+       INFORMASI
+    ============================== */
 
-    <div class="row">
+    .dashboard-intro {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 22px;
+        margin-bottom: 24px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+        text-align: center;
+    }
 
-        @forelse($polis as $poli)
+    .dashboard-intro p {
+        margin: 0;
+        color: #5f6b7a;
+        font-size: 15px;
+    }
 
-        <div class="col-lg-3 col-md-6 mb-4">
 
-                <div class="card shadow border-0 h-100 poli-card">
-                    <div class="card-body text-center">
+    /* ==============================
+       POLI CARD
+    ============================== */
 
-                        @switch($poli->poli_tujuan)
-                            @case('Poli Umum')
-                                <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
-                                @break
-                            @case('Poli Gigi')
-                                <i class="fas fa-tooth fa-3x text-success mb-3"></i>
-                                @break
-                            @case('Poli KIA')
-                                <i class="fas fa-female fa-3x text-danger mb-3"></i>
-                                @break
-                            @case('Poli Anak')
-                                <i class="fas fa-baby fa-3x text-warning mb-3"></i>
-                                @break
-                            @default
-                                <i class="fas fa-hospital fa-3x text-info mb-3"></i>
-                        @endswitch
+    .poli-card {
+        border: none;
+        border-radius: 16px;
+        height: 100%;
+        overflow: hidden;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        transition: all 0.2s ease;
+    }
 
-                        <h5 class="fw-bold">{{ $poli->poli_tujuan }}</h5>
+    .poli-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.13);
+    }
 
-                        <h1 class="display-5 fw-bold text-dark">{{ $poli->jumlah_pasien }}</h1>
+    .poli-card .card-body {
+        padding: 25px;
+        text-align: center;
+    }
 
-                        <p class="text-muted mb-4">Pasien Hari Ini</p>
 
-                        <a href="{{ route('pemeriksaan.awal.poli', $poli->poli_tujuan) }}" class="btn btn-primary">
-                            Masuk <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
+    /* ==============================
+       WARNA CARD
+    ============================== */
 
-                    </div>
-                </div>
+    .card-umum {
+        background: #eff6ff;
+    }
 
-            </a>
-        </div>
+    .card-gigi {
+        background: #eef2ff;
+    }
 
-        @empty
+    .card-kia {
+        background: #fdf2f8;
+    }
 
-        <div class="col-12">
-            <div class="alert alert-info mb-0">
-                Belum ada pasien yang menunggu pemeriksaan awal hari ini.
-            </div>
-        </div>
+    .card-kb {
+        background: #fffbeb;
+    }
 
-        @endforelse
+    .card-gizi {
+        background: #f0fdf4;
+    }
 
-    </div>
+    .card-sanitarian {
+        background: #ecfdf5;
+    }
+
+    .card-mtbs {
+        background: #f5f3ff;
+    }
+
+
+    /* ==============================
+       ICON
+    ============================== */
+
+    .poli-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 15px;
+
+        border-radius: 14px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 30px;
+    }
+
+    .icon-umum {
+        background: #dbeafe;
+    }
+
+    .icon-gigi {
+        background: #e0e7ff;
+    }
+
+    .icon-kia {
+        background: #fce7f3;
+    }
+
+    .icon-kb {
+        background: #fef3c7;
+    }
+
+    .icon-gizi {
+        background: #dcfce7;
+    }
+
+    .icon-sanitarian {
+        background: #d1fae5;
+    }
+
+    .icon-mtbs {
+        background: #ede9fe;
+    }
+
+
+    /* ==============================
+       TEXT
+    ============================== */
+
+    .poli-name {
+        font-size: 17px;
+        font-weight: 600;
+        color: #102347;
+        margin-bottom: 8px;
+    }
+
+    .poli-number {
+        font-size: 38px;
+        font-weight: 700;
+        line-height: 1.2;
+        color: #102347;
+    }
+
+    .poli-description {
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: 6px;
+        margin-bottom: 18px;
+    }
+
+
+    /* ==============================
+       BUTTON
+    ============================== */
+
+    .btn-masuk {
+        padding: 8px 18px;
+        border-radius: 7px;
+    }
+
+
+    /* ==============================
+       RESPONSIVE
+    ============================== */
+
+    @media (max-width: 768px) {
+
+        .poli-number {
+            font-size: 32px;
+        }
+
+        .poli-card .card-body {
+            padding: 20px;
+        }
+
+    }
+
+</style>
+
+
+{{-- ==========================================
+     INFORMASI
+========================================== --}}
+
+<div class="dashboard-intro">
+
+    <p>
+        Silakan pilih poli untuk melihat daftar pasien
+        yang akan dilakukan pemeriksaan awal.
+    </p>
 
 </div>
 
-<style>
-.poli-card{
-    transition:.25s;
-    border-radius:18px;
-}
-.poli-card:hover{
-    transform:translateY(-6px);
-    box-shadow:0 15px 35px rgba(0,0,0,.15)!important;
-}
-</style>
+
+{{-- ==========================================
+     DAFTAR POLI
+========================================== --}}
+
+<div class="row g-3">
+
+
+    @foreach($polis as $poli)
+
+        @php
+
+            $nama = $poli->poli_tujuan;
+
+            $classCard = match($nama) {
+
+                'Poli Umum' => 'card-umum',
+                'Poli Gigi' => 'card-gigi',
+                'Poli KIA' => 'card-kia',
+                'Poli KB' => 'card-kb',
+                'Poli Gizi' => 'card-gizi',
+                'Poli Sanitarian' => 'card-sanitarian',
+                'Poli MTBS' => 'card-mtbs',
+
+                default => 'card-umum'
+
+            };
+
+            $classIcon = match($nama) {
+
+                'Poli Umum' => 'icon-umum',
+                'Poli Gigi' => 'icon-gigi',
+                'Poli KIA' => 'icon-kia',
+                'Poli KB' => 'icon-kb',
+                'Poli Gizi' => 'icon-gizi',
+                'Poli Sanitarian' => 'icon-sanitarian',
+                'Poli MTBS' => 'icon-mtbs',
+
+                default => 'icon-umum'
+
+            };
+
+            $icon = match($nama) {
+
+                'Poli Umum' => '🩺',
+                'Poli Gigi' => '🦷',
+                'Poli KIA' => '👩‍⚕️',
+                'Poli KB' => '👶',
+                'Poli Gizi' => '🥗',
+                'Poli Sanitarian' => '🌱',
+                'Poli MTBS' => '👶',
+
+                default => '🏥'
+
+            };
+
+        @endphp
+
+
+        <div class="col-xl-3 col-lg-4 col-md-6">
+
+            <div class="card poli-card {{ $classCard }}">
+
+                <div class="card-body">
+
+
+                    {{-- ICON --}}
+
+                    <div class="poli-icon {{ $classIcon }}">
+
+                        {{ $icon }}
+
+                    </div>
+
+
+                    {{-- NAMA POLI --}}
+
+                    <div class="poli-name">
+
+                        {{ $nama }}
+
+                    </div>
+
+
+                    {{-- JUMLAH PASIEN --}}
+
+                    <div class="poli-number">
+
+                        {{ $poli->jumlah_pasien }}
+
+                    </div>
+
+
+                    <div class="poli-description">
+
+                        Pasien Hari Ini
+
+                    </div>
+
+
+                    {{-- BUTTON --}}
+
+                    <a href="{{ route(
+                        'pemeriksaan.awal.poli',
+                        ['namaPoli' => $nama]
+                    ) }}"
+                       class="btn btn-primary btn-masuk">
+
+                        Masuk
+                        <span class="ms-1">→</span>
+
+                    </a>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    @endforeach
+
+
+</div>
+
 @endsection

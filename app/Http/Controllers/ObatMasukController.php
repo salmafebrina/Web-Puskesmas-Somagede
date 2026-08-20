@@ -3,122 +3,100 @@
 namespace App\Http\Controllers;
 
 use App\Models\Obat;
-use App\Models\ObatMasuk;
 use Illuminate\Http\Request;
 
 class ObatMasukController extends Controller
 {
-    public function index()
-    {
-        $obatMasuks = ObatMasuk::with('obat')
-                        ->latest()
-                        ->get();
+   public function index(Request $request)
+{
+    $search = $request->search;
 
-        return view(
-            'farmasi.ObatMasuk.index',
-            compact('obatMasuks')
-        );
-    }
+    $obats = Obat::query()
+        ->when($search, function ($query) use ($search) {
+            $query->where('nama_obat', 'like', '%' . $search . '%')
+                  ->orWhere('kategori_obat', 'like', '%' . $search . '%');
+        })
+        ->latest()
+        ->get();
 
+    return view(
+        'Farmasi.ObatMasuk.index',
+        compact('obats', 'search')
+    );
+}
     public function create()
     {
-        $obats = Obat::all();
-
-        return view(
-            'farmasi.ObatMasuk.create',
-            compact('obats')
-        );
+        return view('farmasi.obatMasuk.create');
     }
 
     public function store(Request $request)
     {
-    $request->validate([
-        'nama_obat' => 'required',
-        'tanggal_masuk' => 'required|date',
-        'jumlah_masuk' => 'required|integer|min:1',
-        'keterangan' => 'nullable'
-    ]);
+        $request->validate([
+            'nama_obat'       => 'required',
+            'jenis_obat'      => 'required',
+            'kategori_obat'   => 'required',
+            'stok_obat'       => 'required|numeric',
+            'stok_minimum'    => 'required|numeric',
+            'satuan_obat'     => 'required',
+            'tanggal_expired' => 'required|date',
+        ]);
 
-    // Simpan riwayat obat masuk
-    ObatMasuk::create([
-        'nama_obat' => $request->nama_obat,
-        'tanggal_masuk' => $request->tanggal_masuk,
-        'jumlah_masuk' => $request->jumlah_masuk,
-        'keterangan' => $request->keterangan,
-    ]);
+        Obat::create([
+            'nama_obat'       => $request->nama_obat,
+            'jenis_obat'      => $request->jenis_obat,
+            'kategori_obat'   => $request->kategori_obat,
+            'stok_obat'       => $request->stok_obat,
+            'stok_minimum'    => $request->stok_minimum,
+            'satuan_obat'     => $request->satuan_obat,
+            'tanggal_expired' => $request->tanggal_expired,
+        ]);
 
-    // Tambahkan stok obat
-    $obat = Obat::findOrFail($request->id_obat);
-
-    $obat->stok += $request->jumlah_masuk;
-
-    $obat->save();
-
-    return redirect()
-        ->route('obat-masuk.index')
-        ->with('success', 'Data obat masuk berhasil disimpan.');
+        return redirect()
+            ->route('obat-masuk.index')
+            ->with('success', 'Data obat berhasil ditambahkan.');
     }
 
-    public function edit($id)
+    public function edit(Obat $obat)
     {
-    $obatMasuk = ObatMasuk::findOrFail($id);
-
-    $obats = Obat::all();
-
-    return view(
-        'farmasi.ObatMasuk.edit',
-        compact('obatMasuk', 'obats')
-    );
+        return view(
+            'farmasi.obat-masuk.edit',
+            compact('obat')
+        );
     }
 
-    public function update(Request $request, $id)
-{
-    $request->validate([
-        'id_obat' => 'required',
-        'tanggal_masuk' => 'required|date',
-        'jumlah_masuk' => 'required|integer|min:1',
-        'keterangan' => 'nullable'
-    ]);
-
-    $obatMasuk = ObatMasuk::findOrFail($id);
-
-    $obat = Obat::findOrFail($obatMasuk->id_obat);
-
-    // Kembalikan stok lama
-    $obat->stok -= $obatMasuk->jumlah_masuk;
-
-    // Tambahkan stok baru
-    $obat->stok += $request->jumlah_masuk;
-
-    $obat->save();
-
-    // Update data
-    $obatMasuk->update([
-        'id_obat' => $request->id_obat,
-        'tanggal_masuk' => $request->tanggal_masuk,
-        'jumlah_masuk' => $request->jumlah_masuk,
-        'keterangan' => $request->keterangan,
-    ]);
-
-    return redirect()
-        ->route('obat-masuk.index')
-        ->with('success', 'Data obat masuk berhasil diperbarui.');
-}
-
-    public function destroy($id)
+    public function update(Request $request, Obat $obat)
     {
-    $obatMasuk = ObatMasuk::findOrFail($id);
+        $request->validate([
+            'nama_obat'       => 'required',
+            'jenis_obat'      => 'required',
+            'kategori_obat'   => 'required',
+            'stok_obat'       => 'required|numeric',
+            'stok_minimum'    => 'required|numeric',
+            'satuan_obat'     => 'required',
+            'tanggal_expired' => 'required|date',
+        ]);
 
-    $obat = Obat::findOrFail($obatMasuk->id_obat);
+        $obat->update([
+            'nama_obat'       => $request->nama_obat,
+            'jenis_obat'      => $request->jenis_obat,
+            'kategori_obat'   => $request->kategori_obat,
+            'stok_obat'       => $request->stok_obat,
+            'stok_minimum'    => $request->stok_minimum,
+            'satuan_obat'     => $request->satuan_obat,
+            'tanggal_expired' => $request->tanggal_expired,
+        ]);
 
-    $obat->stok -= $obatMasuk->jumlah_masuk;
+        return redirect()
+            ->route('obat-masuk.index')
+            ->with('success', 'Data obat berhasil diperbarui.');
+    }
 
-    $obat->save();
+    public function destroy(Obat $obat)
+    {
+        $obat->delete();
 
-    $obatMasuk->delete();
-
-    return redirect()
-        ->route('obat-masuk.index')
-        ->with('success', 'Data obat masuk berhasil dihapus.');
+        return redirect()
+            ->route('obat-masuk.index')
+            ->with('success', 'Data obat berhasil dihapus.');
     }
 }

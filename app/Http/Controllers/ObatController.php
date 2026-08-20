@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Obat;
+use App\Models\Resep;
+use App\Models\DetailPenggunaanObat;
 use Illuminate\Http\Request;
 
 class ObatController extends Controller
@@ -40,6 +42,48 @@ public function index()
         ->with('success', 'Data obat berhasil ditambahkan');
 }
 
+    public function dashboard()
+{
+    // =============================
+    // STOK OBAT MENIPIS
+    // =============================
+
+    $stokMenipis = Obat::whereColumn(
+        'stok_obat',
+        '<=',
+        'stok_minimum'
+    )->count();
+
+
+    // =============================
+    // RESEP MENUNGGU
+    // =============================
+
+    $resepMenunggu = Resep::where(
+        'status_resep',
+        'Menunggu'
+    )->count();
+
+
+    // =============================
+    // OBAT KELUAR HARI INI
+    // =============================
+
+    $obatKeluarHariIni = DetailPenggunaanObat::whereDate(
+        'created_at',
+        today()
+    )->sum('jumlah');
+
+
+    return view(
+        'farmasi.dashboard',
+        compact(
+            'resepMenunggu',
+            'obatKeluarHariIni',
+            'stokMenipis'
+        )
+    );
+}
     /**
      * Display the specified resource.
      */
@@ -78,5 +122,22 @@ public function index()
 
     return redirect()->route('obat.index')
         ->with('success', 'Data obat berhasil dihapus');
+}
+public function riwayatPenyerahan(Request $request)
+{
+    // Default: tanggal hari ini
+    $tanggal = $request->tanggal ?? now()->toDateString();
+
+    $riwayat = PenyerahanObat::with([
+        'kunjungan.pasien'
+    ])
+    ->whereDate('created_at', $tanggal)
+    ->orderBy('created_at', 'desc')
+    ->get();
+
+    return view('farmasi.riwayat-penyerahan', compact(
+        'riwayat',
+        'tanggal'
+    ));
 }
 }

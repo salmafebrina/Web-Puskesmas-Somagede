@@ -16,41 +16,172 @@ use App\Models\Rujukan;
 
 class PoliController extends Controller
 {
-    public function index()
-    {
-        $kunjungans = Kunjungan::where(
-            'status_kunjungan',
-            'Menunggu Pemeriksaan Poli'
+
+
+public function dashboard()
+{
+    // =============================
+    // PASIEN MENUNGGU PER POLI
+    // HANYA UNTUK HARI INI
+    // =============================
+
+    $jumlahPoliUmum = Kunjungan::whereDate(
+        'tanggal_kunjungan',
+        today()
+    )
+    ->where('poli_tujuan', 'Poli Umum')
+    ->where('status_kunjungan', 'Menunggu Pemeriksaan Poli')
+    ->count();
+
+
+    $jumlahPoliGigi = Kunjungan::whereDate(
+        'tanggal_kunjungan',
+        today()
+    )
+    ->where('poli_tujuan', 'Poli Gigi')
+    ->where('status_kunjungan', 'Menunggu Pemeriksaan Poli')
+    ->count();
+
+
+    $jumlahPoliKia = Kunjungan::whereDate(
+        'tanggal_kunjungan',
+        today()
+    )
+    ->where('poli_tujuan', 'Poli KIA')
+    ->where('status_kunjungan', 'Menunggu Pemeriksaan Poli')
+    ->count();
+
+
+    $jumlahPoliKb = Kunjungan::whereDate(
+        'tanggal_kunjungan',
+        today()
+    )
+    ->where('poli_tujuan', 'Poli KB')
+    ->where('status_kunjungan', 'Menunggu Pemeriksaan Poli')
+    ->count();
+
+
+    $jumlahPoliGizi = Kunjungan::whereDate(
+        'tanggal_kunjungan',
+        today()
+    )
+    ->where('poli_tujuan', 'Poli Gizi')
+    ->where('status_kunjungan', 'Menunggu Pemeriksaan Poli')
+    ->count();
+
+
+    $jumlahPoliSanitarian = Kunjungan::whereDate(
+        'tanggal_kunjungan',
+        today()
+    )
+    ->where('poli_tujuan', 'Poli Sanitarian')
+    ->where('status_kunjungan', 'Menunggu Pemeriksaan Poli')
+    ->count();
+
+
+    $jumlahPoliMtbs = Kunjungan::whereDate(
+        'tanggal_kunjungan',
+        today()
+    )
+    ->where('poli_tujuan', 'Poli MTBS')
+    ->where('status_kunjungan', 'Menunggu Pemeriksaan Poli')
+    ->count();
+
+
+    return view(
+        'pemeriksaan.dashboard',
+        compact(
+            'jumlahPoliUmum',
+            'jumlahPoliGigi',
+            'jumlahPoliKia',
+            'jumlahPoliKb',
+            'jumlahPoliGizi',
+            'jumlahPoliSanitarian',
+            'jumlahPoliMtbs'
         )
-        ->latest()
+    );
+}
+   public function index()
+{
+    $daftarPoli = [
+        'Poli Umum',
+        'Poli Gigi',
+        'Poli KIA',
+        'Poli KB',
+        'Poli Gizi',
+        'Poli Sanitarian',
+        'Poli MTBS',
+    ];
+
+    $jumlahPerPoli = Kunjungan::select('poli_tujuan')
+        ->selectRaw('COUNT(*) as jumlah_pasien')
+        ->whereDate('tanggal_kunjungan', today())
+        ->where('status_kunjungan', 'Menunggu Pemeriksaan Poli')
+        ->groupBy('poli_tujuan')
+        ->pluck('jumlah_pasien', 'poli_tujuan');
+
+    $polis = collect($daftarPoli)->map(function ($namaPoli) use ($jumlahPerPoli) {
+
+        return (object) [
+            'poli_tujuan'   => $namaPoli,
+            'jumlah_pasien' => $jumlahPerPoli->get($namaPoli, 0),
+        ];
+
+    });
+
+    return view(
+        'pemeriksaan.poli.index',
+        compact('polis')
+    );
+}
+
+public function poli($namaPoli)
+{
+    $prioritas = Kunjungan::with('pasien')
+        ->where('poli_tujuan', $namaPoli)
+        ->whereDate('tanggal_kunjungan', today())
+        ->where('status_kunjungan', 'Menunggu Pemeriksaan Poli')
+        ->where('jenis_antrian', 'Prioritas')
+        ->orderBy('created_at')
         ->get();
 
-        return view(
-            'pemeriksaan.poli.index',
-            compact('kunjungans')
-        );
-    }
+    $reguler = Kunjungan::with('pasien')
+        ->where('poli_tujuan', $namaPoli)
+        ->whereDate('tanggal_kunjungan', today())
+        ->where('status_kunjungan', 'Menunggu Pemeriksaan Poli')
+        ->where('jenis_antrian', 'Reguler')
+        ->orderBy('created_at')
+        ->get();
 
-    
+    return view(
+        'pemeriksaan.poli.daftar',
+        compact(
+            'namaPoli',
+            'prioritas',
+            'reguler'
+        )
+    );
+}
 
-    public function create($id)
+public function create($id)
 {
     $obats = Obat::orderBy('nama_obat')->get();
 
-   $tarifs = Tarif::whereNotIn('kategori', [
-    'Pemeriksaan Penunjang Laboratorium',
-])->orderBy('sub_kategori')
-  ->orderBy('jenis_tindakan')
-  ->get();
+    $tarifs = Tarif::whereNotIn('kategori', [
+        'Pemeriksaan Penunjang Laboratorium',
+    ])
+    ->orderBy('sub_kategori')
+    ->orderBy('jenis_tindakan')
+    ->get();
 
     $kunjungan = Kunjungan::with([
         'pasien',
         'pemeriksaan'
     ])->findOrFail($id);
-    
+
     $detailLabs = DetailLab::orderBy('kategori_lab')
-                    ->orderBy('jenis_pemeriksaan_lab')
-                    ->get();
+        ->orderBy('jenis_pemeriksaan_lab')
+        ->get();
 
     return view(
         'pemeriksaan.poli.create',

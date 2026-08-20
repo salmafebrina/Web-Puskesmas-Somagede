@@ -11,31 +11,72 @@ class PemeriksaanAwalController extends Controller
 {
     public function index()
 {
-    // Daftar poli tetap. Kalau ada poli baru, tinggal tambah di sini.
     $daftarPoli = [
         'Poli Umum',
         'Poli Gigi',
         'Poli KIA',
-        'Poli Anak',
+        'Poli KB',
+        'Poli Gizi',
+        'Poli Sanitarian',
+        'Poli MTBS',
     ];
 
-    // Hitung jumlah pasien menunggu pemeriksaan awal hari ini, per poli
     $jumlahPerPoli = Kunjungan::select('poli_tujuan')
         ->selectRaw('COUNT(*) as jumlah_pasien')
         ->whereDate('tanggal_kunjungan', today())
-        ->where('status_kunjungan', 'Menunggu Pemeriksaan Awal')
+        ->where('status_kunjungan', 'Menunggu Pemeriksaan Poli')
         ->groupBy('poli_tujuan')
-        ->pluck('jumlah_pasien', 'poli_tujuan'); // hasil: ['Poli Umum' => 3, 'Poli Gigi' => 1, ...]
+        ->pluck('jumlah_pasien', 'poli_tujuan');
 
-    // Gabungkan: semua poli tetap muncul, default 0 kalau belum ada pasien
     $polis = collect($daftarPoli)->map(function ($namaPoli) use ($jumlahPerPoli) {
+
         return (object) [
             'poli_tujuan'   => $namaPoli,
             'jumlah_pasien' => $jumlahPerPoli->get($namaPoli, 0),
         ];
+
     });
 
-    return view('pemeriksaan.awal.index', compact('polis'));
+    return view(
+        'pemeriksaan.awal.index',
+        compact('polis')
+    );
+    }
+
+    public function poli($namaPoli)
+{
+    // ==========================
+    // ANTRIAN PRIORITAS
+    // ==========================
+
+    $prioritas = Kunjungan::where('poli_tujuan', $namaPoli)
+        ->whereDate('tanggal_kunjungan', today())
+        ->where('status_kunjungan', 'Menunggu Pemeriksaan Awal')
+        ->where('jenis_antrian', 'Prioritas')
+        ->orderBy('kode_kunjungan')
+        ->get();
+
+
+    // ==========================
+    // ANTRIAN REGULER
+    // ==========================
+
+    $reguler = Kunjungan::where('poli_tujuan', $namaPoli)
+        ->whereDate('tanggal_kunjungan', today())
+        ->where('status_kunjungan', 'Menunggu Pemeriksaan Awal')
+        ->where('jenis_antrian', 'Reguler')
+        ->orderBy('kode_kunjungan')
+        ->get();
+
+
+    return view(
+        'pemeriksaan.awal.poli',
+        compact(
+            'namaPoli',
+            'prioritas',
+            'reguler'
+        )
+    );
 }
 
     public function create($id)
@@ -115,25 +156,6 @@ class PemeriksaanAwalController extends Controller
             );
     }
 
-    public function poli($namaPoli)
-{
-    $prioritas = collect();
-
-    $reguler = Kunjungan::where('poli_tujuan', $namaPoli)
-        ->whereDate('tanggal_kunjungan', today())
-        ->where('status_kunjungan', 'Menunggu Pemeriksaan Awal')
-        ->orderBy('kode_kunjungan')
-        ->get();
-
-    return view(
-        'pemeriksaan.awal.poli',
-        compact(
-            'namaPoli',
-            'prioritas',
-            'reguler'
-        )
-    );
-}
 
     public function show($id)
     {

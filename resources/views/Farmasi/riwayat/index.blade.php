@@ -1,120 +1,157 @@
 @extends('layouts.farmasi')
 
+@section('title', 'Riwayat Penyerahan Obat')
+
 @section('content')
 
 <div class="container-fluid">
 
-<h2 class="fw-bold mb-4">
+    <h1 class="mb-4">Riwayat Penyerahan Obat</h1>
 
-Riwayat Penyerahan Obat
+    {{-- FILTER TANGGAL --}}
+    <div class="card mb-4">
+        <div class="card-body">
 
-</h2>
+            <form method="GET"
+                  action="{{ route('farmasi.riwayat.index') }}"
+                  class="row align-items-end g-3">
 
-<div class="card shadow-sm">
+                <div class="col-md-4">
 
-<div class="card-body">
+                    <label for="tanggal" class="form-label">
+                        Tanggal
+                    </label>
 
-<table class="table table-bordered table-hover">
+                    <input
+                        type="date"
+                        name="tanggal"
+                        id="tanggal"
+                        class="form-control"
+                        value="{{ $tanggal }}"
+                    >
 
-<thead class="table-success">
+                </div>
 
-<tr>
+                <div class="col-md-auto">
 
-<th>No</th>
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Tampilkan
+                    </button>
 
-<th>Tanggal</th>
+                </div>
 
-<th>Pasien</th>
+                <div class="col-md-auto">
 
-<th>Poli</th>
+                    <a href="{{ route('farmasi.riwayat.index') }}"
+                       class="btn btn-secondary">
+                        Hari Ini
+                    </a>
 
-<th>Dokter</th>
+                </div>
 
-<th>Status</th>
+            </form>
 
-<th>Aksi</th>
+        </div>
+    </div>
 
-</tr>
 
-</thead>
+    {{-- TABEL RIWAYAT --}}
+    <div class="card">
 
-<tbody>
+        <div class="card-header">
+            <strong>
+                Riwayat Penyerahan
+                {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d F Y') }}
+            </strong>
+        </div>
 
-@forelse($riwayats as $item)
+        <div class="card-body">
 
-<tr>
+            <div class="table-responsive">
 
-<td>{{ $loop->iteration }}</td>
+                <table class="table table-bordered">
 
-<td>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal & Jam</th>
+                            <th>Pasien</th>
+                            <th>Poli</th>
+                            <th>Dokter</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
 
-{{ \Carbon\Carbon::parse($item->tanggal_penyerahan)->format('d-m-Y H:i') }}
+                    <tbody>
 
-</td>
+                        @forelse($riwayats as $item)
 
-<td>
+                            <tr>
 
-{{ $item->resep->pemeriksaan->kunjungan->pasien->nama_pasien }}
+                                <td>
+                                    {{ $loop->iteration }}
+                                </td>
 
-</td>
+                                <td>
+                                    {{ $item->created_at->format('d-m-Y H:i') }}
+                                </td>
 
-<td>
+                                <td>
+                                    {{ $item->kunjungan->pasien->nama_pasien ?? '-' }}
+                                </td>
 
-nanti ditambahin
+                                <td>
+                                    {{ $item->kunjungan->poli_tujuan ?? '-' }}
+                                </td>
 
-</td>
+                                <td>
+                                    -
+                                </td>
 
-<td>
+                                <td>
+                                    <span class="badge bg-success">
+                                        Selesai
+                                    </span>
+                                </td>
 
-{{ $item->resep->pemeriksaan->dokter }}
+                                <td>
 
-</td>
+                                    <a href="#"
+                                       class="btn btn-primary btn-sm">
+                                        Detail
+                                    </a>
 
-<td>
+                                </td>
 
-<span class="badge bg-success">
+                            </tr>
 
-Selesai
+                        @empty
 
-</span>
+                            <tr>
 
-</td>
+                                <td colspan="7"
+                                    class="text-center py-4">
 
-<td>
+                                    Tidak ada riwayat penyerahan
+                                    obat pada tanggal ini.
 
-<a
-href="{{ route('farmasi.riwayat.show',$item->id_penyerahan) }}"
-class="btn btn-primary btn-sm">
+                                </td>
 
-Detail
+                            </tr>
 
-</a>
+                        @endforelse
 
-</td>
+                    </tbody>
 
-</tr>
+                </table>
 
-@empty
+            </div>
 
-<tr>
+        </div>
 
-<td colspan="7" class="text-center">
-
-Belum ada data.
-
-</td>
-
-</tr>
-
-@endforelse
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
+    </div>
 
 </div>
 

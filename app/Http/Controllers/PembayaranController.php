@@ -185,10 +185,68 @@ foreach ($ambulance as $item){
     ));
     }
 
-    public function dashboard()
-    {
-    return view('pembayaran.dashboard'); }
+   public function dashboard()
+{
+    // =============================
+    // MENUNGGU PEMBAYARAN
+    // =============================
 
+    $menungguPembayaran = Kunjungan::where(
+        'status_kunjungan',
+        'Menunggu Pembayaran'
+    )->count();
+
+
+    // =============================
+    // TRANSAKSI HARI INI
+    // =============================
+
+    $transaksiHariIni = TransaksiPembayaran::whereDate(
+        'tanggal_pembayaran',
+        today()
+    )->count();
+
+
+    // =============================
+    // PENDAPATAN HARI INI
+    // =============================
+
+    $pendapatanHariIni = TransaksiPembayaran::whereDate(
+        'tanggal_pembayaran',
+        today()
+    )
+    ->where(
+        'status_pembayaran',
+        'Lunas'
+    )
+    ->sum('total_pembayaran');
+
+
+    // =============================
+    // PEMBAYARAN SELESAI
+    // =============================
+
+    $pembayaranSelesai = TransaksiPembayaran::whereDate(
+        'tanggal_pembayaran',
+        today()
+    )
+    ->where(
+        'status_pembayaran',
+        'Lunas'
+    )
+    ->count();
+
+
+    return view(
+        'pembayaran.dashboard',
+        compact(
+            'menungguPembayaran',
+            'transaksiHariIni',
+            'pendapatanHariIni',
+            'pembayaranSelesai'
+        )
+    );
+}
     public function store(Request $request, $id)
 {
     $request->validate([

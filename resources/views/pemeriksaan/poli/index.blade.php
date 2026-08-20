@@ -1,100 +1,336 @@
 @extends('layouts.pemeriksaan')
 
-@section('title','Pemeriksaan Poli')
+@section('title', 'Pemeriksaan Poli')
 
-@section('page-title','Pemeriksaan Poli')
+@section('page-title', 'Pemeriksaan Poli')
 
 @section('content')
 
-<div class="card">
+<style>
 
-    <div class="card-header">
+    /* ==============================
+       INFORMASI
+    ============================== */
 
-        <h4>Daftar Pasien Pemeriksaan Poli</h4>
+    .dashboard-intro {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 22px;
+        margin-bottom: 24px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+        text-align: center;
+    }
 
-    </div>
+    .dashboard-intro p {
+        margin: 0;
+        color: #5f6b7a;
+        font-size: 15px;
+    }
 
-    <div class="card-body">
 
-        <table class="table table-bordered">
+    /* ==============================
+       POLI CARD
+    ============================== */
 
-            <thead>
+    .poli-card {
+        border: none;
+        border-radius: 16px;
+        height: 100%;
+        overflow: hidden;
 
-                <tr>
+        box-shadow: 0 4px 14px rgba(0,0,0,0.08);
 
-                    <th>No RM</th>
+        transition: all 0.2s ease;
+    }
 
-                    <th>Nama Pasien</th>
+    .poli-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.13);
+    }
 
-                    <th>Poli</th>
+    .poli-card .card-body {
+        padding: 25px;
+        text-align: center;
+    }
 
-                    <th>Jaminan</th>
 
-                    <th>Status</th>
+    /* ==============================
+       WARNA CARD
+    ============================== */
 
-                    <th>Aksi</th>
+    .card-umum {
+        background: #eff6ff;
+    }
 
-                </tr>
+    .card-gigi {
+        background: #eef2ff;
+    }
 
-            </thead>
+    .card-kia {
+        background: #fdf2f8;
+    }
 
-            <tbody>
+    .card-kb {
+        background: #fffbeb;
+    }
 
-            @forelse($kunjungans as $kunjungan)
+    .card-gizi {
+        background: #f0fdf4;
+    }
 
-                <tr>
+    .card-sanitarian {
+        background: #ecfdf5;
+    }
 
-                    <td>{{ $kunjungan->no_rekam_medis }}</td>
+    .card-mtbs {
+        background: #f5f3ff;
+    }
 
-                    <td>{{ $kunjungan->nama_pasien }}</td>
 
-                    <td>{{ $kunjungan->poli_tujuan }}</td>
+    /* ==============================
+       ICON
+    ============================== */
 
-                    <td>{{ $kunjungan->jenis_jaminan }}</td>
+    .poli-icon {
+        width: 60px;
+        height: 60px;
 
-                    <td>
+        margin: 0 auto 15px;
 
-                        <span class="badge bg-warning">
+        border-radius: 14px;
 
-                            {{ $kunjungan->status_kunjungan }}
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-                        </span>
+        font-size: 30px;
+    }
 
-                    </td>
+    .icon-umum {
+        background: #dbeafe;
+    }
 
-                    <td>
+    .icon-gigi {
+        background: #e0e7ff;
+    }
 
-                        <a
-                            href="{{ route('pemeriksaan.poli.create',$kunjungan->id_kunjungan) }}"
-                            class="btn btn-primary btn-sm">
+    .icon-kia {
+        background: #fce7f3;
+    }
 
-                            Pemeriksaan
+    .icon-kb {
+        background: #fef3c7;
+    }
 
-                        </a>
+    .icon-gizi {
+        background: #dcfce7;
+    }
 
-                    </td>
+    .icon-sanitarian {
+        background: #d1fae5;
+    }
 
-                </tr>
+    .icon-mtbs {
+        background: #ede9fe;
+    }
 
-            @empty
 
-                <tr>
+    /* ==============================
+       TEXT
+    ============================== */
 
-                    <td colspan="6" class="text-center">
+    .poli-name {
+        font-size: 17px;
+        font-weight: 600;
 
-                        Tidak ada pasien.
+        color: #102347;
 
-                    </td>
+        margin-bottom: 8px;
+    }
 
-                </tr>
+    .poli-number {
+        font-size: 38px;
+        font-weight: 700;
 
-            @endforelse
+        line-height: 1.2;
 
-            </tbody>
+        color: #102347;
+    }
 
-        </table>
+    .poli-description {
+        font-size: 13px;
 
-    </div>
+        color: #6b7280;
+
+        margin-top: 6px;
+        margin-bottom: 18px;
+    }
+
+
+    /* ==============================
+       BUTTON
+    ============================== */
+
+    .btn-masuk {
+        padding: 8px 18px;
+        border-radius: 7px;
+    }
+
+
+    /* ==============================
+       RESPONSIVE
+    ============================== */
+
+    @media (max-width: 768px) {
+
+        .poli-number {
+            font-size: 32px;
+        }
+
+        .poli-card .card-body {
+            padding: 20px;
+        }
+
+    }
+
+</style>
+
+
+{{-- ==========================================
+     INFORMASI
+========================================== --}}
+
+<div class="dashboard-intro">
+
+    <p>
+        Silakan pilih poli untuk melihat daftar pasien
+        yang menunggu pemeriksaan poli.
+    </p>
+
+</div>
+
+
+{{-- ==========================================
+     DAFTAR POLI
+========================================== --}}
+
+<div class="row g-3">
+
+    @foreach($polis as $poli)
+
+        @php
+
+            $nama = $poli->poli_tujuan;
+
+            $classCard = match($nama) {
+
+                'Poli Umum' => 'card-umum',
+                'Poli Gigi' => 'card-gigi',
+                'Poli KIA' => 'card-kia',
+                'Poli KB' => 'card-kb',
+                'Poli Gizi' => 'card-gizi',
+                'Poli Sanitarian' => 'card-sanitarian',
+                'Poli MTBS' => 'card-mtbs',
+
+                default => 'card-umum'
+
+            };
+
+
+            $classIcon = match($nama) {
+
+                'Poli Umum' => 'icon-umum',
+                'Poli Gigi' => 'icon-gigi',
+                'Poli KIA' => 'icon-kia',
+                'Poli KB' => 'icon-kb',
+                'Poli Gizi' => 'icon-gizi',
+                'Poli Sanitarian' => 'icon-sanitarian',
+                'Poli MTBS' => 'icon-mtbs',
+
+                default => 'icon-umum'
+
+            };
+
+
+            $icon = match($nama) {
+
+                'Poli Umum' => '🩺',
+                'Poli Gigi' => '🦷',
+                'Poli KIA' => '👩‍⚕️',
+                'Poli KB' => '👶',
+                'Poli Gizi' => '🥗',
+                'Poli Sanitarian' => '🌱',
+                'Poli MTBS' => '👶',
+
+                default => '🏥'
+
+            };
+
+        @endphp
+
+
+        <div class="col-xl-3 col-lg-4 col-md-6">
+
+            <div class="card poli-card {{ $classCard }}">
+
+                <div class="card-body">
+
+
+                    {{-- ICON --}}
+
+                    <div class="poli-icon {{ $classIcon }}">
+
+                        {{ $icon }}
+
+                    </div>
+
+
+                    {{-- NAMA POLI --}}
+
+                    <div class="poli-name">
+
+                        {{ $nama }}
+
+                    </div>
+
+
+                    {{-- JUMLAH PASIEN --}}
+
+                    <div class="poli-number">
+
+                        {{ $poli->jumlah_pasien }}
+
+                    </div>
+
+
+                    <div class="poli-description">
+
+                        Pasien menunggu pemeriksaan
+
+                    </div>
+
+
+                    {{-- BUTTON --}}
+
+                    <a href="{{ route(
+                        'pemeriksaan.poli.daftar',
+                        ['namaPoli' => $nama]
+                    ) }}"
+                       class="btn btn-primary btn-masuk">
+
+                        Masuk
+                        <span class="ms-1">→</span>
+
+                    </a>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    @endforeach
 
 </div>
 

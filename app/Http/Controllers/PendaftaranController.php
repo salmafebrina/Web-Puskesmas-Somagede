@@ -10,23 +10,83 @@ use Illuminate\Http\Request;
 
 class PendaftaranController extends Controller
 {
-    public function index(Request $request)
+   public function index(Request $request)
 {
+    // ==============================
+    // DATA KUNJUNGAN HARI INI
+    // ==============================
+
     $query = Kunjungan::query();
 
-    // Jika user memilih tanggal
     if ($request->filled('tanggal')) {
-        $query->whereDate('tanggal_kunjungan', $request->tanggal);
+        $query->whereDate(
+            'tanggal_kunjungan',
+            $request->tanggal
+        );
     } else {
-        // Default tampilkan kunjungan hari ini
-        $query->whereDate('tanggal_kunjungan', now()->toDateString());
+        $query->whereDate(
+            'tanggal_kunjungan',
+            today()
+        );
     }
 
     $kunjungans = $query->get();
 
-    return view('pendaftaran', compact('kunjungans'));
-}
 
+    // ==============================
+    // JUMLAH ANTRIAN PRIORITAS
+    // ==============================
+
+    $jumlahPrioritas = Antrian::whereDate(
+        'created_at',
+        today()
+    )
+    ->where('jenis_antrian', 'Prioritas')
+    ->where('status_antrian', 'Menunggu')
+    ->count();
+
+
+    // ==============================
+    // JUMLAH ANTRIAN REGULER
+    // ==============================
+
+    $jumlahReguler = Antrian::whereDate(
+        'created_at',
+        today()
+    )
+    ->where('jenis_antrian', 'Reguler')
+    ->where('status_antrian', 'Menunggu')
+    ->count();
+
+
+    // ==============================
+    // TOTAL PASIEN TERDAFTAR
+    // ==============================
+
+    $pasienBerkunjungHariIni = Kunjungan::whereDate(
+    'tanggal_kunjungan',
+    today()
+)->count();
+
+
+    // ==============================
+    // PASIEN BARU HARI INI
+    // ==============================
+
+    $pasienBaru = Pasien::whereDate(
+        'created_at',
+        today()
+    )->count();
+
+
+    return view('pendaftaran', compact(
+        'kunjungans',
+        'jumlahPrioritas',
+        'jumlahReguler',
+        'pasienBerkunjungHariIni',
+        'pasienBaru'
+    ));
+}
 
 public function daftar()
 {
@@ -52,14 +112,6 @@ public function daftar()
 }
 
 
-public function pasien()
-{
-    return $this->belongsTo(
-        Pasien::class,
-        'nik_pasien',
-        'nik_pasien'
-    );
-}
 
 public function riwayat(Request $request)
 {
